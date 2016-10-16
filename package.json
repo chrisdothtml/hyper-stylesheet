@@ -1,5 +1,9 @@
 {
   "name": "hyper-stylesheet",
   "version": "0.0.1",
-  "description": "Adds support for an external hyper stylesheet"
+  "description": "Adds support for an external hyper stylesheet",
+  "main": "lib/index.js",
+  "dependencies": {
+    "open": "0.0.5"
+  }
 }
