@@ -6,8 +6,6 @@
 
 - css and termCSS splitting
 
-- clicking the menu item should create file if it doesn't exist
-
 - hyper install instructions
 
 - preprocessor support
