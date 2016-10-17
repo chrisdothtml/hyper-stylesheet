@@ -1,13 +1,16 @@
 {
   "name": "hyper-stylesheet",
   "version": "0.0.1",
+  "license": "MIT",
   "description": "Adds support for an external hyper stylesheet",
-  "main": "lib/index.js",
-  "dependencies": {
-    "open": "0.0.5"
-  },
   "keywords": [
     "hyper",
     "stylesheet"
-  ]
+  ],
+  "repository": "https://github.com/chrisdothtml/hyper-stylesheet",
+  "bugs": "https://github.com/chrisdothtml/hyper-stylesheet/issues",
+  "main": "lib/index.js",
+  "dependencies": {
+    "open": "0.0.5"
+  }
 }
