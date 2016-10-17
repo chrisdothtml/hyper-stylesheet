@@ -26,4 +26,4 @@ Edit your `~/.hyper.css` file via `Hyper > Stylesheet...` (creates one if it doe
 
 `#window` and `#terminal` are interchangeable with `#css` and `#termCSS`.
 
-[screenshot]: img/screenshot.png
+[screenshot]: https://raw.githubusercontent.com/chrisdothtml/hyper-stylesheet/master/img/screenshot.png
