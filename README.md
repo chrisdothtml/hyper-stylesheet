@@ -4,8 +4,10 @@
 
 ### TODO
 
-- css and termCSS splitting
-
 - hyper install instructions
+
+- watch css file create/delete/update
+
+- refresh when css file changed
 
 - preprocessor support
