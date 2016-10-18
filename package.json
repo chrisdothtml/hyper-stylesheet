@@ -11,6 +11,12 @@
   "bugs": "https://github.com/chrisdothtml/hyper-stylesheet/issues",
   "main": "lib/index.js",
   "dependencies": {
+    "defaults": "^1.0.3",
+    "electron": "^1.4.3",
+    "gaze": "^1.1.2",
     "open": "0.0.5"
+  },
+  "devDependencies": {
+    "standard": "^8.4.0"
   }
 }
