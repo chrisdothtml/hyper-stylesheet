@@ -1,6 +1,6 @@
 # hyper-stylesheet
 
-> Adds support for an external [hyper](https://hyper.is) stylesheet
+> Adds support for an external [hyper][hyper] stylesheet
 
 ![Screenshot][screenshot]
 
@@ -28,5 +28,31 @@ Edit your `~/.hyper.css` file via `Hyper > Stylesheet...` (creates one if it doe
 
 `#window` and `#terminal` are interchangeable with `#css` and `#termCSS`.
 
-[screenshot]: https://raw.githubusercontent.com/chrisdothtml/hyper-stylesheet/master/img/screenshot.png
+## Options
+
+To set options, open `~/.hyper.js`, and add a 'hyper-stylesheet' property to `config`:
+
+```js
+module.exports = {
+  config: {
+    ...
+    'hyper-stylesheet': {
+      ...
+    }
+  },
+  plugins: [],
+  localPlugins: []
+}
+```
+
+### auto-reload
+
+Type: `boolean`
+
+Default: `false`
+
+Full-reloads all open hyper windows upon saving `~/.hyper.css`
+
 [hpm]: https://github.com/zeit/hpm
+[hyper]: https://hyper.is
+[screenshot]: https://raw.githubusercontent.com/chrisdothtml/hyper-stylesheet/master/img/screenshot.png
