@@ -51,7 +51,7 @@ Type: `boolean`
 
 Default: `false`
 
-Full-reloads all open hyper windows upon saving `~/.hyper.css`
+Upon saving `~/.hyper.css`, full-reloads any hyper windows once focused
 
 [hpm]: https://github.com/zeit/hpm
 [hyper]: https://hyper.is
