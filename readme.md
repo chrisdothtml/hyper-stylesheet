@@ -30,7 +30,7 @@ Edit your `~/.hyper.css` file via `Hyper > Stylesheet...` (creates one if it doe
 
 ## Options
 
-To set options, open `~/.hyper.js`, and add a 'hyper-stylesheet' property to `config`:
+To set options, open `~/.hyper.js`, and add `hyper-stylesheet` to `config`:
 
 ```js
 module.exports = {
@@ -49,9 +49,9 @@ module.exports = {
 
 Type: `boolean`
 
-Default: `false`
+Default: `true`
 
-Upon saving `~/.hyper.css`, full-reloads any hyper windows once focused
+Upon saving `~/.hyper.css`, hyper config will auto refresh to update CSS
 
 [hpm]: https://github.com/zeit/hpm
 [hyper]: https://hyper.is
