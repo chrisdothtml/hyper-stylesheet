@@ -53,6 +53,10 @@ Default: `true`
 
 Upon saving `~/.hyper.css`, hyper config will auto refresh to update CSS
 
+## License
+
+[MIT](LICENSE)
+
 [hpm]: https://github.com/zeit/hpm
 [hyper]: https://hyper.is
 [screenshot]: https://raw.githubusercontent.com/chrisdothtml/hyper-stylesheet/master/img/screenshot.png
