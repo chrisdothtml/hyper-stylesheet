@@ -46,7 +46,7 @@ module.exports = {
 }
 ```
 
-### auto-reload
+### autoReload
 
 Type: `boolean`
 

@@ -125,7 +125,14 @@ function watch () {
     });
 
     watch.on('changed', () => {
-      if (store.options['auto-reload']) {
+      const { options } = store;
+      const shouldAutoReload = options.autoReload === true || options['auto-reload'] === true;
+
+      if (options['auto-reload']) {
+        console.warn('[hyper-stylesheet] `auto-reload` option is deprecated. Use `autoReload instead`');
+      }
+
+      if (shouldAutoReload) {
         updateHash();
       }
     });
@@ -160,10 +167,10 @@ function initFile (createNew = true) {
 /**
  * Initial one-time plugin setup
  */
-function initMain (config) {
+function initMain (options = {}) {
   store.options = Object.assign({
-    'auto-reload': true
-  }, (config[name] || {}));
+    autoReload: true
+  }, options);
 
   initFile(false);
   store.initialized = true;
@@ -171,15 +178,10 @@ function initMain (config) {
 
 const { STYLESHEET_PATH: STYLESHEET_PATH$2 } = store;
 
-/**
- * Adds .hyper.css contents to the config object
- *
- * @returns {object}
- */
 // TODO: preprocessor support
 function decorateConfig (config) {
   if (!store.initialized) {
-    initMain(config);
+    initMain(config[name]);
   }
 
   if (store.fileExists) {
@@ -195,11 +197,6 @@ function decorateConfig (config) {
   return config
 }
 
-/**
- * Adds button to Hyper menu for opening stylesheet
- *
- * @returns {array}
- */
 function decorateMenu (menus) {
   const newItem = {
     label: 'Stylesheet...',
