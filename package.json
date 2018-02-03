@@ -8,15 +8,21 @@
     "stylesheet"
   ],
   "repository": "github:chrisdothtml/hyper-stylesheet",
-  "main": "lib/index.js",
+  "main": "dist/bundle.js",
   "scripts": {
+    "build": "rollup -c",
     "lint": "standard '**/*.js' --verbose | snazzy"
+  },
+  "standard": {
+    "ignore": ["dist"]
   },
   "dependencies": {
     "gaze": "^1.1.2",
     "open": "0.0.5"
   },
   "devDependencies": {
+    "rollup": "^0.55.3",
+    "rollup-plugin-json": "^2.3.0",
     "snazzy": "^7.0.0",
     "standard": "^8.4.0"
   }
