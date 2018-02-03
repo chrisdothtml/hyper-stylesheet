@@ -1,20 +1,14 @@
 {
   "name": "hyper-stylesheet",
   "version": "0.1.0",
-  "license": "MIT",
   "description": "Adds support for an external hyper stylesheet",
-  "keywords": [
-    "hyper",
-    "stylesheet"
-  ],
-  "repository": "github:chrisdothtml/hyper-stylesheet",
   "main": "dist/bundle.js",
+  "author": "Chris Deacy <chrisdothtml@gmail.com>",
+  "repository": "github:chrisdothtml/hyper-stylesheet",
+  "license": "MIT",
   "scripts": {
     "build": "rollup -c",
     "lint": "standard '**/*.js' --verbose | snazzy"
-  },
-  "standard": {
-    "ignore": ["dist"]
   },
   "dependencies": {
     "gaze": "^1.1.2",
@@ -25,5 +19,17 @@
     "rollup-plugin-json": "^2.3.0",
     "snazzy": "^7.0.0",
     "standard": "^8.4.0"
-  }
+  },
+  "standard": {
+    "ignore": ["dist"]
+  },
+  "keywords": [
+    "css",
+    "external",
+    "hyper",
+    "hyper.app",
+    "hyperterm",
+    "stylesheet",
+    "terminal"
+  ]
 }

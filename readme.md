@@ -1,10 +1,10 @@
 # hyper-stylesheet
 
-> Adds support for an external [hyper][hyper] stylesheet
+> Adds support for an external [hyper](https://hyper.is) stylesheet
 
-![Screenshot][screenshot]
+![Screenshot](https://raw.githubusercontent.com/chrisdothtml/hyper-stylesheet/master/img/screenshot.png)
 
-## Install with [hpm][hpm]
+## Install with [hpm](https://github.com/zeit/hpm)
 
 ```bash
 hpm install hyper-stylesheet
@@ -30,18 +30,19 @@ Edit your `~/.hyper.css` file via `Hyper > Stylesheet...` (creates one if it doe
 
 ## Options
 
-To set options, open `~/.hyper.js`, and add `hyper-stylesheet` to `config`:
+To provide options, add `hyper-stylesheet` to your `.hyper.js` config
 
 ```js
 module.exports = {
   config: {
-    ...
+    // ...
     'hyper-stylesheet': {
-      ...
+      // ...
     }
   },
-  plugins: [],
-  localPlugins: []
+  plugins: [
+    'hyper-stylesheet'
+  ]
 }
 ```
 
@@ -51,12 +52,8 @@ Type: `boolean`
 
 Default: `true`
 
-Upon saving `~/.hyper.css`, hyper config will auto refresh to update CSS
+Upon saving your `.hyper.css`, hyper will auto refresh
 
 ## License
 
 [MIT](LICENSE)
-
-[hpm]: https://github.com/zeit/hpm
-[hyper]: https://hyper.is
-[screenshot]: https://raw.githubusercontent.com/chrisdothtml/hyper-stylesheet/master/img/screenshot.png
