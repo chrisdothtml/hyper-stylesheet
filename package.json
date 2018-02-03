@@ -7,16 +7,17 @@
     "hyper",
     "stylesheet"
   ],
-  "repository": "https://github.com/chrisdothtml/hyper-stylesheet",
-  "bugs": "https://github.com/chrisdothtml/hyper-stylesheet/issues",
+  "repository": "github:chrisdothtml/hyper-stylesheet",
   "main": "lib/index.js",
+  "scripts": {
+    "lint": "standard '**/*.js' --verbose | snazzy"
+  },
   "dependencies": {
-    "defaults": "^1.0.3",
     "gaze": "^1.1.2",
-    "md5": "^2.2.1",
     "open": "0.0.5"
   },
   "devDependencies": {
+    "snazzy": "^7.0.0",
     "standard": "^8.4.0"
   }
 }
