@@ -6,15 +6,15 @@
 
 ## Install
 
-Either install with [hpm](https://github.com/zeit/hpm):
+Add to the `plugins` array in your `.hyper.js`:
 
-```bash
-$ hpm install hyper-stylesheet
+```javascript
+plugins: [
+  'hyper-stylesheet'
+]
 ```
 
-or add `hyper-stylesheet` to the `plugins` array in your `.hyper.js`
-
-**Note**: if you want your CSS file to override all other plugins, it must be the last item in the `plugins` array
+**Note**: if you want your CSS to override all other plugins, it must be the last item in the array
 
 ## Use
 
