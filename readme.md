@@ -1,8 +1,8 @@
+![Screenshot](img/screenshot.gif)
+
 # hyper-stylesheet
 
 > Adds support for an external [hyper](https://hyper.is) stylesheet
-
-![Screenshot](https://raw.githubusercontent.com/chrisdothtml/hyper-stylesheet/master/img/screenshot.png)
 
 ## Install
 
@@ -18,7 +18,7 @@ or add `hyper-stylesheet` to the `plugins` array in your `.hyper.js`
 
 ## Use
 
-Open your `.hyper.css` file via `Hyper > Stylesheet...`. You can define the `css` and/or `termCSS` properties with the following indicators:
+Open your `.hyper.css` file from the menu via `Hyper > Stylesheet...`. You can define the `css` and/or `termCSS` properties with the following indicators:
 
 ```css
 /* #css */
