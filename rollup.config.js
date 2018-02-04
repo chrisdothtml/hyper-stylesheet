@@ -1,4 +1,5 @@
-import json from 'rollup-plugin-json'
+import importJson from 'rollup-plugin-json'
+import importStrings from 'rollup-plugin-string'
 
 const meta = require('./package.json')
 
@@ -15,6 +16,7 @@ export default {
   },
   external: getExternals(),
   plugins: [
-    json()
+    importJson(),
+    importStrings({ include: '**/*.tmpl' })
   ]
 }

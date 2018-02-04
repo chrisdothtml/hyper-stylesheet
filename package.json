@@ -17,11 +17,14 @@
   "devDependencies": {
     "rollup": "^0.55.3",
     "rollup-plugin-json": "^2.3.0",
+    "rollup-plugin-string": "^2.0.2",
     "snazzy": "^7.0.0",
     "standard": "^8.4.0"
   },
   "standard": {
-    "ignore": ["dist"]
+    "ignore": [
+      "dist"
+    ]
   },
   "keywords": [
     "css",

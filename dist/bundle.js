@@ -4,18 +4,15 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
-var os = _interopDefault(require('os'));
-var path = _interopDefault(require('path'));
-var fs = require('fs');
 var crypto = _interopDefault(require('crypto'));
+var fs = require('fs');
 var gaze = _interopDefault(require('gaze'));
-var open = _interopDefault(require('open'));
+var openFile = _interopDefault(require('open'));
+var path = _interopDefault(require('path'));
+var os = require('os');
 
-/**
- * Parses each section out of the provided file source
- *
- * @returns {object}
- */
+var hyperCssTemplate = "/* #window */\n/* CSS for the window goes here */\n\n/* #terminal */\n/* CSS for the terminal goes here */\n";
+
 function getSections (src) {
   const result = {};
   const sections = {
@@ -39,17 +36,14 @@ function getSections (src) {
   return result
 }
 
-/**
- * Separates CSS into sections
- *
- * @returns {object}
+/*
+ * separate `.hyper.css` into sections
  */
 function parse (src) {
   const { css, termCSS } = getSections(src);
   const result = {};
 
   if (!css && !termCSS) {
-    // no sections in file
     result.css = src;
     result.termCSS = '';
   } else {
@@ -66,20 +60,35 @@ function parse (src) {
   return result
 }
 
-const HOME_PATH = os.homedir();
-
-var store = {
-  CONFIG_PATH: path.normalize(`${HOME_PATH}/.hyper.js`),
-  fileExists: false,
-  initialized: false,
-  isWatching: false,
-  STYLESHEET_PATH: path.normalize(`${HOME_PATH}/.hyper.css`),
-  STYLESHEET_TMPL: fs.readFileSync(path.resolve(`${__dirname}/../tmpl/hyper.css`), 'utf-8')
-}
-
 var name = "hyper-stylesheet";
 
-const { CONFIG_PATH, STYLESHEET_PATH } = store;
+function wrapConsoleMethod (method) {
+  const decoration = `[${name}]`;
+
+  return function () {
+    return console[method].apply(
+      console,
+      [decoration].concat(Array.from(arguments))
+    )
+  }
+}
+
+const error = wrapConsoleMethod('error');
+const log = wrapConsoleMethod('log');
+const warn = wrapConsoleMethod('warn');
+
+function fileExists (path$$1) {
+  let result;
+
+  try {
+    fs.accessSync(path$$1);
+    result = true;
+  } catch (e) {
+    result = false;
+  }
+
+  return result
+}
 
 function md5 (input) {
   return crypto
@@ -88,110 +97,204 @@ function md5 (input) {
     .digest('hex')
 }
 
-/**
- * Updates `hyper-stylesheet-hash` in .hyper.js to trigger
- * a plugin reload
- */
-function updateHash () {
+function updateHash (paths) {
+  const { updatePath, watchPath } = paths;
   const key = `${name}-hash`;
-  const stylesheet = fs.readFileSync(STYLESHEET_PATH, 'utf-8');
-  const hash = md5(`${key}:${stylesheet}`);
+  const fileContent = fs.readFileSync(watchPath, 'utf-8');
+  const hash = md5(`${key}:${fileContent}`);
   const hashLine = `// -- ${key}:${hash} --`;
-  const regex = new RegExp(`\\/\\/ -- ${key}:[^-]+--`);
-  let config = fs.readFileSync(CONFIG_PATH, 'utf-8');
+  const pattern = new RegExp(`\\/\\/ -- ${key}:[^-]+--`);
+  let config = fs.readFileSync(updatePath, 'utf-8');
 
-  if (regex.test(config)) {
+  if (pattern.test(config)) {
     // replace existing
-    config = config.replace(regex, hashLine);
+    config = config.replace(pattern, hashLine);
   } else {
     // add new
     config = `${hashLine}\n${config}`;
   }
 
-  fs.writeFileSync(CONFIG_PATH, config, 'utf-8');
+  fs.writeFileSync(updatePath, config, 'utf-8');
 }
 
-/**
- * Creates a file watcher on .hyper.css
- */
-function watch () {
-  gaze(STYLESHEET_PATH, (error, watch) => {
-    if (error) throw error
+class Watcher {
+  constructor () {
+    this.instance = null;
+    this.state = {
+      isWatching: false
+    };
+  }
 
-    watch.on('deleted', () => {
-      watch.close();
-      store.fileExists = false;
-      store.isWatching = false;
-    });
+  isWatching () {
+    return this.state.isWatching
+  }
 
-    watch.on('changed', () => {
-      const { options } = store;
-      const shouldAutoReload = options.autoReload === true || options['auto-reload'] === true;
+  start (watchPath, updatePath) {
+    gaze(watchPath, (err, watcher) => {
+      if (err) {
+        error('file watcher error', err.message);
+      } else {
+        Object.assign(this.state, { isWatching: true });
 
-      if (options['auto-reload']) {
-        console.warn('[hyper-stylesheet] `auto-reload` option is deprecated. Use `autoReload instead`');
+        watcher.on('changed', () => {
+          updateHash({ updatePath, watchPath });
+        });
+
+        watcher.on('deleted', () => {
+          warn('`.hyper.css` was deleted; autoReload disabled');
+          this.stop();
+        });
+
+        this.instance = watcher;
       }
-
-      if (shouldAutoReload) {
-        updateHash();
-      }
     });
+  }
 
-    store.isWatching = true;
-  });
+  stop () {
+    this.instance.close();
+    this.instance = null;
+    Object.assign(this.state, { isWatching: false });
+  }
 }
 
-const { STYLESHEET_PATH: STYLESHEET_PATH$1, STYLESHEET_TMPL } = store;
+var watcher = new Watcher()
 
-/**
- * Creates new .hyper.css file and initializes watcher
- */
-function initFile (createNew = true) {
+function createStylesheet (filepath) {
   try {
-    fs.accessSync(STYLESHEET_PATH$1);
-  } catch (error) {
-    if (createNew) {
-      fs.writeFileSync(STYLESHEET_PATH$1, STYLESHEET_TMPL, 'utf-8');
+    fs.writeFileSync(filepath, hyperCssTemplate, 'utf-8');
+    log(`created new stylesheet at ${filepath}`);
+  } catch (err) {
+    error('failed to create new stylesheet', err.message);
+  }
+}
+
+class Stylesheet {
+  constructor () {
+    this.state = {
+      autoReload: null,
+      hyperCssPath: null,
+      hyperJsPath: null
+    };
+  }
+
+  get () {
+    const { hyperCssPath } = this.state;
+
+    if (fileExists(hyperCssPath)) {
+      return parse(
+        fs.readFileSync(hyperCssPath, 'utf-8')
+      )
     }
   }
 
-  if (!store.fileExists) {
-    store.fileExists = true;
+  open () {
+    const { hyperCssPath } = this.state;
+
+    if (!fileExists(hyperCssPath)) {
+      const { autoReload, hyperJsPath } = this.state;
+
+      createStylesheet(hyperCssPath);
+
+      if (autoReload) {
+        watcher.start(hyperCssPath, hyperJsPath);
+      }
+    }
+
+    openFile(hyperCssPath);
   }
 
-  if (!store.isWatching) {
-    watch();
+  /*
+   * updates state and handle side-effects caused by a state change.
+   * the only reason this is so complicated is because of autoReload
+   */
+  applyOptions (options) {
+    let { autoReload, CONFIG_PATH } = options;
+    const hyperJsPath = path.normalize(CONFIG_PATH);
+
+    // deprecated option
+    if (options['auto-reload'] !== null) {
+      warn('`auto-reload` option is deprecated; use `autoReload` instead');
+
+      if (autoReload === true && options['auto-reload'] === false) {
+        autoReload = false;
+      }
+    }
+
+    // hyperJsPath changed
+    if (this.state.hyperJsPath !== hyperJsPath) {
+      if (fileExists(hyperJsPath)) {
+        const hyperCssPath = path.join(path.dirname(hyperJsPath), '.hyper.css');
+
+        Object.assign(this.state, { hyperJsPath });
+
+        // in case the new js path caused the css path to change
+        if (this.state.hyperCssPath !== hyperCssPath) {
+          Object.assign(this.state, { hyperCssPath });
+
+          if (!fileExists(hyperCssPath)) {
+            createStylesheet(hyperCssPath);
+          }
+
+          if (watcher.isWatching()) {
+            watcher.stop();
+          }
+
+          if (autoReload) {
+            watcher.start(hyperCssPath, hyperJsPath);
+          }
+        }
+      } else {
+        warn('`CONFIG_PATH` provided does not exist');
+      }
+    }
+
+    // autoReload changed
+    if (this.state.autoReload !== autoReload) {
+      Object.assign(this.state, { autoReload });
+
+      if (autoReload === false && watcher.isWatching()) {
+        watcher.stop();
+      } else if (!watcher.isWatching()) {
+        // get fresh paths from state in case they changed above
+        const { hyperCssPath, hyperJsPath } = this.state;
+
+        watcher.start(hyperCssPath, hyperJsPath);
+      }
+    }
   }
 }
 
-/**
- * Initial one-time plugin setup
- */
-function initMain (options = {}) {
-  store.options = Object.assign({
-    autoReload: true
-  }, options);
+var stylesheet = new Stylesheet()
 
-  initFile(false);
-  store.initialized = true;
+function overrideDefaults (options, defaults) {
+  const result = {};
+
+  Object.keys(defaults)
+    .forEach(key => {
+      result[key] = typeof options[key] === 'undefined' ? defaults[key] : options[key];
+    });
+
+  return result
 }
 
-const { STYLESHEET_PATH: STYLESHEET_PATH$2 } = store;
-
-// TODO: preprocessor support
 function decorateConfig (config) {
-  if (!store.initialized) {
-    initMain(config[name]);
-  }
-
-  if (store.fileExists) {
-    const src = fs.readFileSync(STYLESHEET_PATH$2, 'utf-8');
-    const parsed = parse(src);
-
-    return Object.assign({}, config, {
-      css: (config.css || '') + parsed.css,
-      termCSS: (config.termCSS || '') + parsed.termCSS
+  stylesheet.applyOptions(
+    overrideDefaults(config[name], {
+      'auto-reload': null, // deprecated
+      autoReload: true,
+      CONFIG_PATH: path.join(os.homedir(), '.hyper.js')
     })
+  );
+
+  const configProperties = stylesheet.get();
+
+  if (configProperties) {
+    const { css, termCSS } = configProperties;
+
+    config = Object.assign(config, {
+      css: (config.css || '') + css,
+      termCSS: (config.termCSS || '') + termCSS
+    });
   }
 
   return config
@@ -200,13 +303,7 @@ function decorateConfig (config) {
 function decorateMenu (menus) {
   const newItem = {
     label: 'Stylesheet...',
-    click () {
-      if (!store.fileExists) {
-        initFile();
-      }
-
-      open(STYLESHEET_PATH$2);
-    }
+    click: stylesheet.open.bind(stylesheet)
   };
 
   // break reference
@@ -214,13 +311,13 @@ function decorateMenu (menus) {
 
   menusLoop: // eslint-disable-line no-labels
   for (let i = 0; i < menus.length; i++) {
-    let menu = menus[i];
+    const menu = menus[i];
 
     if (menu.label === 'Hyper') {
-      let items = menu.submenu;
+      const items = menu.submenu;
 
       for (let i = 0; i < items.length; i++) {
-        let item = items[i];
+        const item = items[i];
 
         if (item.label === 'Preferences...') {
           items.splice(i + 1, 0, newItem);
