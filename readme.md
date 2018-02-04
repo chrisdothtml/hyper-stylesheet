@@ -4,35 +4,41 @@
 
 ![Screenshot](https://raw.githubusercontent.com/chrisdothtml/hyper-stylesheet/master/img/screenshot.png)
 
-## Install with [hpm](https://github.com/zeit/hpm)
+## Install
+
+Either install with [hpm](https://github.com/zeit/hpm):
 
 ```bash
-hpm install hyper-stylesheet
+$ hpm install hyper-stylesheet
 ```
+
+or add `hyper-stylesheet` to the `plugins` array in your `.hyper.js`
+
+**Note**: if you want your CSS file to override all other plugins, it must be the last item in the `plugins` array
 
 ## Use
 
-Edit your `~/.hyper.css` file via `Hyper > Stylesheet...` (creates one if it doesn't exist). You can define both the `css` and `termCSS` properties with sections.
+Open your `.hyper.css` file via `Hyper > Stylesheet...`. You can define the `css` and/or `termCSS` properties with the following indicators:
 
 ```css
-/* #window */
-.tab_active {
-  border: 1px solid #fff;
+/* #css */
+.some-class {
+  font-size: 20px;
 }
 
-/* #terminal */
-.cursor-node {
-  border-color: #fff;
+/* #termCSS */
+.some-class {
+  color: #000;
 }
 ```
 
-`#window` and `#terminal` are interchangeable with `#css` and `#termCSS`.
+`#css`/`#termCSS` are interchangeable with `#window`/`#terminal`. If no indicators are provided, the `css` property will be used
 
 ## Options
 
 To provide options, add `hyper-stylesheet` to your `.hyper.js` config
 
-```js
+```javascript
 module.exports = {
   config: {
     // ...
@@ -52,7 +58,25 @@ Type: `boolean`
 
 Default: `true`
 
-Upon saving your `.hyper.css`, hyper will auto refresh
+Upon saving `.hyper.css`, your terminal will auto-reload to show the changes
+
+## Contributing
+
+If you're running hyper in dev mode ([info](https://github.com/zeit/hyper/issues/2568#issuecomment-355227246)), add the following to your `.../[hyper-repo]/.hyper.js` config:
+
+```javascript
+module.exports = {
+  config: {
+    'hyper-stylesheet': {
+      // this was `__filename` at first, but `.hyper.js` can't use that...
+      CONFIG_PATH: '/absolute/path/to/this/.hyper.js',
+    }
+    // ...
+  }
+}
+```
+
+This allows the plugin to also run in dev mode
 
 ## License
 
