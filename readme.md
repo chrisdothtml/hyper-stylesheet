@@ -36,14 +36,13 @@ Open your `.hyper.css` file via `Hyper > Stylesheet...`. You can define the `css
 
 ## Options
 
-To provide options, add `hyper-stylesheet` to your `.hyper.js` config
+To provide options, add `hyper-stylesheet` to your `.hyper.js` config:
 
 ```javascript
 module.exports = {
   config: {
-    // ...
     'hyper-stylesheet': {
-      // ...
+      autoReload: false
     }
   },
   plugins: [
@@ -62,21 +61,19 @@ Upon saving `.hyper.css`, your terminal will auto-reload to show the changes
 
 ## Contributing
 
-If you're running hyper in dev mode ([info](https://github.com/zeit/hyper/issues/2568#issuecomment-355227246)), add the following to your `.../[hyper-repo]/.hyper.js` config:
+If you're running hyper in dev mode ([info](https://github.com/zeit/hyper/issues/2568#issuecomment-355227246)), open your development config file (`.../[hyper-repo]/.hyper.js`) and provide the absolute path to itself:
 
 ```javascript
 module.exports = {
   config: {
     'hyper-stylesheet': {
-      // this was `__filename` at first, but `.hyper.js` can't use that...
-      CONFIG_PATH: '/absolute/path/to/this/.hyper.js',
+      CONFIG_PATH: '/path/to/.hyper.js',
     }
-    // ...
   }
 }
 ```
 
-This allows the plugin to also run in dev mode
+`hyper-stylesheet` needs to be able to modify your config file to trigger auto-reload. This step allows the plugin to use your dev config file instead of the primary one
 
 ## License
 
