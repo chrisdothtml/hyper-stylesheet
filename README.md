@@ -2,6 +2,9 @@
 
 # hyper-stylesheet
 
+[![npm version](https://img.shields.io/npm/v/hyper-stylesheet.svg)](https://www.npmjs.com/package/hyper-stylesheet)
+[![StandardJS](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
+
 > Adds support for an external [hyper](https://hyper.is) stylesheet
 
 ## Install
