@@ -18,7 +18,7 @@ plugins: [
 
 ## Use
 
-Open your `.hyper.css` file from the menu via `Hyper > Stylesheet...`. You can define the `css` and/or `termCSS` properties with the following indicators:
+Open your `.hyper.css` file from the menu via `Hyper > Stylesheet...` (`Edit > Stylseheet...` if you're on windows). You can define the `css` and/or `termCSS` properties with the following indicators:
 
 ```css
 /* #css */
