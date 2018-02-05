@@ -306,6 +306,7 @@ function decorateConfig (config) {
 }
 
 function decorateMenu (menus) {
+  const parentMenuName = process.platform === 'win32' ? 'Edit' : 'Hyper';
   const newItem = {
     label: 'Stylesheet...',
     click: stylesheet.open.bind(stylesheet)
@@ -318,7 +319,7 @@ function decorateMenu (menus) {
   for (let i = 0; i < menus.length; i++) {
     const menu = menus[i];
 
-    if (menu.label === 'Hyper') {
+    if (menu.label === parentMenuName) {
       const items = menu.submenu;
 
       for (let i = 0; i < items.length; i++) {
