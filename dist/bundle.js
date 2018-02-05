@@ -266,6 +266,9 @@ class Stylesheet {
 
 var stylesheet = new Stylesheet()
 
+/*
+ * override default options if provided; ignore all other properties
+ */
 function overrideDefaults (options, defaults) {
   const result = {};
 
@@ -278,8 +281,10 @@ function overrideDefaults (options, defaults) {
 }
 
 function decorateConfig (config) {
+  const options = config[name] || {};
+
   stylesheet.applyOptions(
-    overrideDefaults(config[name], {
+    overrideDefaults(options, {
       'auto-reload': null, // deprecated
       autoReload: true,
       CONFIG_PATH: path.join(os.homedir(), '.hyper.js')
