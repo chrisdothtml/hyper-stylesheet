@@ -13,6 +13,50 @@ var os = require('os');
 
 var hyperCssTemplate = "/* #window */\n/* CSS for the window goes here */\n\n/* #terminal */\n/* CSS for the terminal goes here */\n";
 
+var name = "hyper-stylesheet";
+
+const BANNER_KEY = `${name}-hash`;
+
+function fileExists (path$$1) {
+  let result;
+
+  try {
+    fs.accessSync(path$$1);
+    result = true;
+  } catch (e) {
+    result = false;
+  }
+
+  return result
+}
+
+function generateBanner (hash) {
+  return `/* -- ${BANNER_KEY}:${hash} -- */`
+}
+
+function hasBanner (str, hash) {
+  const banner = generateBanner(hash);
+  return !!~str.indexOf(banner)
+}
+
+function updateBanner (str, hash) {
+  const pattern = new RegExp(`\\/\\* -- ${BANNER_KEY}:[^-]+-- \\*\\/`);
+
+  // remove old
+  if (pattern.test(str)) {
+    str = str.replace(pattern, '');
+  }
+
+  return `${generateBanner(hash)}\n${str}`
+}
+
+function md5 (input) {
+  return crypto
+    .createHash('md5')
+    .update(input)
+    .digest('hex')
+}
+
 function getSections (src) {
   const result = {};
   const sections = {
@@ -41,7 +85,9 @@ function getSections (src) {
  */
 function parse (src) {
   const { css, termCSS } = getSections(src);
-  const result = {};
+  const result = {
+    hash: md5(src)
+  };
 
   if (!css && !termCSS) {
     result.css = src;
@@ -60,8 +106,6 @@ function parse (src) {
   return result
 }
 
-var name = "hyper-stylesheet";
-
 function wrapConsoleMethod (method) {
   const decoration = `[${name}]`;
 
@@ -77,44 +121,16 @@ const error = wrapConsoleMethod('error');
 const log = wrapConsoleMethod('log');
 const warn = wrapConsoleMethod('warn');
 
-function fileExists (path$$1) {
-  let result;
-
-  try {
-    fs.accessSync(path$$1);
-    result = true;
-  } catch (e) {
-    result = false;
-  }
-
-  return result
-}
-
-function md5 (input) {
-  return crypto
-    .createHash('md5')
-    .update(input)
-    .digest('hex')
-}
-
 function updateHash (paths) {
   const { updatePath, watchPath } = paths;
-  const key = `${name}-hash`;
   const fileContent = fs.readFileSync(watchPath, 'utf-8');
-  const hash = md5(`${key}:${fileContent}`);
-  const hashLine = `// -- ${key}:${hash} --`;
-  const pattern = new RegExp(`\\/\\/ -- ${key}:[^-]+--`);
+  const hash = md5(fileContent);
   let config = fs.readFileSync(updatePath, 'utf-8');
 
-  if (pattern.test(config)) {
-    // replace existing
-    config = config.replace(pattern, hashLine);
-  } else {
-    // add new
-    config = `${hashLine}\n${config}`;
+  if (!hasBanner(config, hash)) {
+    config = updateBanner(config, hash);
+    fs.writeFileSync(updatePath, config, 'utf-8');
   }
-
-  fs.writeFileSync(updatePath, config, 'utf-8');
 }
 
 class Watcher {
@@ -280,6 +296,20 @@ function overrideDefaults (options, defaults) {
   return result
 }
 
+function addCssToConfig (config) {
+  const userStylesheet = stylesheet.get();
+
+  if (userStylesheet) {
+    const { hash, css, termCSS } = userStylesheet;
+
+    // TODO: use hash to check for banner
+    config = Object.assign(config, {
+      css: (config.css || '') + css,
+      termCSS: (config.termCSS || '') + termCSS
+    });
+  }
+}
+
 function decorateConfig (config) {
   const options = config[name] || {};
 
@@ -291,18 +321,7 @@ function decorateConfig (config) {
     })
   );
 
-  const configProperties = stylesheet.get();
-
-  if (configProperties) {
-    const { css, termCSS } = configProperties;
-
-    config = Object.assign(config, {
-      css: (config.css || '') + css,
-      termCSS: (config.termCSS || '') + termCSS
-    });
-  }
-
-  return config
+  return addCssToConfig(config)
 }
 
 function decorateMenu (menus) {
