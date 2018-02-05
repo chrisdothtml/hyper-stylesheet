@@ -1,1 +1,6 @@
+.editorconfig
+CONTRIBUTING.md
 img
+lib
+rollup.config.js
+TODO.md
