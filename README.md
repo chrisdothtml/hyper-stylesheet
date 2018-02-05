@@ -1,4 +1,4 @@
-![Screenshot](img/screenshot.gif)
+![Screenshot](https://raw.githubusercontent.com/chrisdothtml/hyper-stylesheet/master/img/screenshot.gif)
 
 # hyper-stylesheet
 
