@@ -1,6 +1,6 @@
 {
   "name": "hyper-stylesheet",
-  "version": "0.1.1-beta.2",
+  "version": "0.1.1",
   "description": "Adds support for an external hyper stylesheet",
   "main": "dist/bundle.js",
   "author": "Chris Deacy <chrisdothtml@gmail.com>",
