@@ -7,6 +7,7 @@ function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'defau
 var crypto = _interopDefault(require('crypto'));
 var fs = require('fs');
 var gaze = _interopDefault(require('gaze'));
+var pfs = require('pfs');
 var openFile = _interopDefault(require('open'));
 var path = _interopDefault(require('path'));
 var os = require('os');
@@ -97,14 +98,14 @@ function md5 (input) {
     .digest('hex')
 }
 
-function updateHash (paths) {
+async function updateHash (paths) {
   const { updatePath, watchPath } = paths;
   const key = `${name}-hash`;
-  const fileContent = fs.readFileSync(watchPath, 'utf-8');
+  const fileContent = await pfs.readFile(watchPath, 'utf-8');
   const hash = md5(`${key}:${fileContent}`);
   const hashLine = `// -- ${key}:${hash} --`;
   const pattern = new RegExp(`\\/\\/ -- ${key}:[^-]+--`);
-  let config = fs.readFileSync(updatePath, 'utf-8');
+  let config = await pfs.readFile(updatePath, 'utf-8');
 
   if (pattern.test(config)) {
     // replace existing
@@ -114,7 +115,7 @@ function updateHash (paths) {
     config = `${hashLine}\n${config}`;
   }
 
-  fs.writeFileSync(updatePath, config, 'utf-8');
+  return pfs.writeFile(updatePath, config, 'utf-8')
 }
 
 class Watcher {
@@ -137,7 +138,8 @@ class Watcher {
         Object.assign(this.state, { isWatching: true });
 
         watcher.on('changed', () => {
-          updateHash({ updatePath, watchPath });
+          updateHash({ updatePath, watchPath })
+            .catch(err => error('error updating .hyper.js', err.message));
         });
 
         watcher.on('deleted', () => {
